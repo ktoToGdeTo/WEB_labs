@@ -20,14 +20,13 @@ public class TaskInMemoryRepository implements TaskRepository{
     @Override
     public Task create(Task task) {
         if (task == null) throw new IllegalArgumentException();
-        task.setCreatedAt(LocalDateTime.now());
+        task.setCreatedAt(LocalDateTime.now().withNano(0));
         if (tasks.isEmpty()) {
             task.setId(1);
         }
         else
         {
-            Task lastTask = (Task) tasks.values().toArray()[tasks.size()-1];
-            task.setId(lastTask.getId()+1);
+            task.setId((long) tasks.keySet().toArray()[tasks.size()-1]+1);
         }
         tasks.put(task.getId(), task);
         return task;
