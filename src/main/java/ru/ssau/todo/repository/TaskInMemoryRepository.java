@@ -1,7 +1,6 @@
 package ru.ssau.todo.repository;
 
 import org.springframework.stereotype.Repository;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.ssau.todo.entity.Task;
 import ru.ssau.todo.entity.TaskStatus;
 import ru.ssau.todo.exceptions.TaskNotFoundException;
@@ -12,7 +11,7 @@ import java.util.*;
 @Repository
 public class TaskInMemoryRepository implements TaskRepository{
 
-    private Map<Long, Task> tasks;
+    private final Map<Long, Task> tasks;
 
     public TaskInMemoryRepository(){
         tasks = new HashMap<>();
@@ -24,13 +23,13 @@ public class TaskInMemoryRepository implements TaskRepository{
         task.setCreatedAt(LocalDateTime.now());
         if (tasks.isEmpty()) {
             task.setId(1);
-            tasks.put(task.getId(), task);
         }
         else
         {
-            task.setId(tasks.size()+1);
-            tasks.put(task.getId(), task);
+            Task lastTask = (Task) tasks.values().toArray()[tasks.size()-1];
+            task.setId(lastTask.getId()+1);
         }
+        tasks.put(task.getId(), task);
         return task;
     }
 
