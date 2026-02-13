@@ -1,4 +1,9 @@
 package ru.ssau.todo.service;
 
-public class TaskService {
+import ru.ssau.todo.entity.Task;
+
+public interface TaskService {
+    void deleteTask(long id);
+
+    Task createTask(Task task);
 }

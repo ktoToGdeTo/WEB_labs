@@ -1,5 +1,6 @@
 package ru.ssau.todo.repository;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.dao.DataAccessException;
@@ -17,16 +18,10 @@ import java.util.Optional;
 
 @Repository
 @Profile("jdbc")
+@AllArgsConstructor
 public class TaskJdbcRepository implements TaskRepository{
-    @Autowired
+
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private InternalResourceViewResolver internalResourceViewResolver;
-
-    public TaskJdbcRepository(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     @Override
     public Task create(Task task) {
@@ -85,11 +80,12 @@ public class TaskJdbcRepository implements TaskRepository{
 
     @Override
     public void deleteById(long id) {
-
+        this.jdbcTemplate.update("delete from task where task.id = ?", id);
     }
 
     @Override
     public long countActiveTasksByUserId(long userId) {
-        return 0;
+        return this.jdbcTemplate.queryForObject("select count(task.id) from task where (created_by = ? and (status in ('OPEN', 'IN_PROGRESS')))",
+                Long.class, userId);
     }
 }

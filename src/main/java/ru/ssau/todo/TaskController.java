@@ -1,11 +1,15 @@
 package ru.ssau.todo;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.RequestToViewNameTranslator;
+import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 import ru.ssau.todo.entity.Task;
 import ru.ssau.todo.exceptions.TaskNotFoundException;
 import ru.ssau.todo.repository.TaskRepository;
+import ru.ssau.todo.service.TaskService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,6 +21,14 @@ public class TaskController {
 
     private final TaskRepository taskRepository;
 
+    @Autowired
+    private TaskService taskService;
+
+    @Autowired
+    private ContentNegotiatingViewResolver contentNegotiatingViewResolver;
+
+    @Autowired
+    private RequestToViewNameTranslator requestToViewNameTranslator;
 
     public TaskController(TaskRepository taskRepository){
         this.taskRepository = taskRepository;
@@ -32,8 +44,9 @@ public class TaskController {
 
     @PostMapping()
     public ResponseEntity<Task> createTask(@RequestBody Task task){
-        Task createdtask = taskRepository.create(task);
-        return ResponseEntity.status(HttpStatus.CREATED).header("Location", "/tasks/"+createdtask.getId()).body(createdtask);
+        Task createdtask = taskService.createTask(task);
+        if (createdtask != null) return ResponseEntity.status(HttpStatus.CREATED).header("Location", "/tasks/"+createdtask.getId()).body(createdtask);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
@@ -57,7 +70,7 @@ public class TaskController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable(name = "id") Long id){
-        taskRepository.deleteById(id);
+        taskService.deleteTask(id);
         return ResponseEntity.noContent().build();
     }
 
