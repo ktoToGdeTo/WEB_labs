@@ -17,26 +17,32 @@ public class TaskController {
     private final TaskRepository taskRepository;
 
 
-    public TaskController(TaskRepository taskRepository){
+    public TaskController(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
     }
 
     @GetMapping("/tasks")
-    public ResponseEntity<List<Task>> getTasks(@RequestParam(value = "from", required = false)LocalDateTime from, @RequestParam(value = "to", required = false) LocalDateTime to,
-                                               @RequestParam(value = "userId") Long userId){
-        if(from == null) from = LocalDateTime.MIN;
-        if(to == null) to = LocalDateTime.MAX;
+    public ResponseEntity<List<Task>> getTasks(@RequestParam(value = "from", required = false) LocalDateTime from,
+                                               @RequestParam(value = "to", required = false) LocalDateTime to,
+                                               @RequestParam(value = "userId") Long userId) {
+        if (from == null) from = LocalDateTime.MIN;
+        if (to == null) to = LocalDateTime.MAX;
+        if (from.isAfter(to)) {
+            LocalDateTime tempDate = to;
+            to = from;
+            from = tempDate;
+        }
         return ResponseEntity.ok(taskRepository.findAll(from, to, userId));
     }
 
     @PostMapping("/tasks")
-    public ResponseEntity<Task> createTask(@RequestBody Task task){
-        Task createdtask = taskRepository.create(task);
-        return ResponseEntity.status(HttpStatus.CREATED).header("Location", "/tasks/"+createdtask.getId()).body(createdtask);
+    public ResponseEntity<Task> createTask(@RequestBody Task task) {
+        Task createdTask = taskRepository.create(task);
+        return ResponseEntity.status(HttpStatus.CREATED).header("Location", "/tasks/" + createdTask.getId()).body(createdTask);
     }
 
     @GetMapping("/tasks/{id}")
-    public ResponseEntity<Optional<Task>> getTask(@PathVariable(name = "id") Long id){
+    public ResponseEntity<Optional<Task>> getTask(@PathVariable(name = "id") Long id) {
         Optional<Task> foundedTask = taskRepository.findById(id);
         if (foundedTask.isPresent()) return ResponseEntity.status(HttpStatus.OK).body(foundedTask);
         else return ResponseEntity.notFound().build();
@@ -47,21 +53,20 @@ public class TaskController {
         task.setId(id);
         try {
             taskRepository.update(task);
-        }
-        catch (TaskNotFoundException e){
+        } catch (TaskNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(null);
     }
 
     @DeleteMapping("tasks/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable(name = "id") Long id){
+    public ResponseEntity<Void> deleteTask(@PathVariable(name = "id") Long id) {
         taskRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("tasks/active/count")
-    public ResponseEntity<Long> countActiveTasks(@RequestParam(value = "userId") Long userId){
+    public ResponseEntity<Long> countActiveTasks(@RequestParam(value = "userId") Long userId) {
         return ResponseEntity.ok(taskRepository.countActiveTasksByUserId(userId));
     }
 }
