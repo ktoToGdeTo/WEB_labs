@@ -14,9 +14,11 @@ import java.util.*;
 public class TaskInMemoryRepository implements TaskRepository{
 
     private final Map<Long, Task> tasks;
+    private long countTasks;
 
     public TaskInMemoryRepository(){
-        tasks = new HashMap<>();
+        tasks = new LinkedHashMap<>();
+        countTasks = 0;
     }
 
     @Override
@@ -24,11 +26,10 @@ public class TaskInMemoryRepository implements TaskRepository{
         if (task == null) throw new IllegalArgumentException();
         task.setCreatedAt(LocalDateTime.now().withNano(0));
         if (tasks.isEmpty()) {
-            task.setId(1);
-        }
-        else
-        {
-            task.setId((long) tasks.keySet().toArray()[tasks.size()-1]+1);
+            countTasks = 1;
+            task.setId(countTasks);
+        } else {
+            task.setId(++countTasks);
         }
         tasks.put(task.getId(), task);
         return task;
@@ -42,10 +43,10 @@ public class TaskInMemoryRepository implements TaskRepository{
     @Override
     public List<Task> findAll(LocalDateTime from, LocalDateTime to, long userId) {
         List<Task> result = new ArrayList<>();
-        for(Task task : tasks.values()){
+        for(Task task : tasks.values()) {
             if((!task.getCreatedAt().isBefore(from))
                     &&(!task.getCreatedAt().isAfter(to))
-                    &&(task.getCreatedBy()==userId))
+                    &&(task.getCreatedBy() == userId))
                 result.add(task);
         }
         return result;
@@ -53,14 +54,12 @@ public class TaskInMemoryRepository implements TaskRepository{
 
     @Override
     public void update(Task task) throws TaskNotFoundException{
-        for(Task t : tasks.values()){
-            if(task.getId() == t.getId()){
-                t.setTitle(task.getTitle());
-                t.setStatus(task.getStatus());
-                return;
-            }
+        Task t = tasks.get(task.getId());
+        if (t!=null){
+            t.setTitle(task.getTitle());
+            t.setStatus(task.getStatus());
         }
-        throw new TaskNotFoundException();
+        else throw new TaskNotFoundException();
     }
 
     @Override
@@ -73,8 +72,8 @@ public class TaskInMemoryRepository implements TaskRepository{
         long result = 0;
         for(Task task : tasks.values()){
             if ((task.getCreatedBy() == userId)&&
-                    (task.getStatus()== TaskStatus.OPEN)
-                    ||task.getStatus()==TaskStatus.IN_PROGRESS)
+                    (task.getStatus()== TaskStatus.OPEN
+                    ||task.getStatus()==TaskStatus.IN_PROGRESS))
                 result++;
         }
         return result;

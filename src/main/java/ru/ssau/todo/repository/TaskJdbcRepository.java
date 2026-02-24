@@ -12,6 +12,8 @@ import ru.ssau.todo.entity.Task;
 import ru.ssau.todo.entity.TaskStatus;
 import ru.ssau.todo.exceptions.TaskNotFoundException;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -23,15 +25,23 @@ public class TaskJdbcRepository implements TaskRepository{
 
     private final JdbcTemplate jdbcTemplate;
 
+    private Task createTaskFromDB(ResultSet resultSet) throws SQLException {
+        Task t = new Task();
+        t.setId(resultSet.getLong("id"));
+        t.setTitle(resultSet.getString("title"));
+        t.setStatus(TaskStatus.valueOf(resultSet.getString("status")));
+        t.setCreatedBy(resultSet.getLong("created_by"));
+        t.setCreatedAt(resultSet.getObject("created_at", LocalDateTime.class));
+        return t;
+    }
+
     @Override
     public Task create(Task task) {
         if (task == null) throw new IllegalArgumentException();
         task.setCreatedAt(LocalDateTime.now().withNano(0));
-        jdbcTemplate.update("insert into task (title, status, created_by, created_at) values (?, ?, ?, ?)",
-                task.getTitle(), task.getStatus().toString(), task.getCreatedBy(), task.getCreatedAt());
-        task.setId(jdbcTemplate.queryForObject(
-                "select id from task ORDER BY id DESC LIMIT 1",
-                Long.class));
+        task.setId(
+        jdbcTemplate.queryForObject("insert into task (title, status, created_by, created_at) values (?, ?, ?, ?) returning task.id",
+                Long.class, task.getTitle(), task.getStatus().toString(), task.getCreatedBy(), task.getCreatedAt()));
         return task;
     }
 
@@ -40,15 +50,7 @@ public class TaskJdbcRepository implements TaskRepository{
         try {
             Task task = jdbcTemplate.queryForObject(
                     "SELECT * FROM task WHERE id = ?",
-                    (resultSet, rowNum) -> {
-                        Task t = new Task();
-                        t.setId(resultSet.getLong("id"));
-                        t.setTitle(resultSet.getString("title"));
-                        t.setStatus(TaskStatus.valueOf(resultSet.getString("status")));
-                        t.setCreatedBy(resultSet.getLong("created_by"));
-                        t.setCreatedAt(resultSet.getObject("created_at", LocalDateTime.class));
-                        return t;
-                    },
+                    (resultSet, rowNum) -> createTaskFromDB(resultSet),
                     id
             );
             return Optional.ofNullable(task);
@@ -61,15 +63,7 @@ public class TaskJdbcRepository implements TaskRepository{
     public List<Task> findAll(LocalDateTime from, LocalDateTime to, long userId) {
         return this.jdbcTemplate.query(
                 "SELECT * FROM task where (created_by = ?) And (created_at <= ?) and (created_at >= ?)",
-                (resultSet, rowNum) -> {
-                    Task task = new Task();
-                    task.setId(resultSet.getLong("id"));
-                    task.setTitle(resultSet.getString("title"));
-                    task.setStatus(TaskStatus.valueOf(resultSet.getString("status")));
-                    task.setCreatedBy(resultSet.getLong("created_by"));
-                    task.setCreatedAt(resultSet.getObject("created_at", LocalDateTime.class));
-                    return task;
-                }, userId, to, from);
+                (resultSet, rowNum) -> createTaskFromDB(resultSet), userId, to, from);
     }
 
     @Override

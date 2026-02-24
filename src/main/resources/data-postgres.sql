@@ -1,0 +1,8 @@
+CREATE TABLE task (
+    id BIGSERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    status VARCHAR(50) NOT NULL
+        CONSTRAINT task_status_check CHECK (status IN ('OPEN', 'IN_PROGRESS', 'DONE', 'CLOSED')),
+    created_by BIGINT NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
