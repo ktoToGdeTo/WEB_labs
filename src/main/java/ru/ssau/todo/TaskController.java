@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.ssau.todo.entity.Task;
+import ru.ssau.todo.entity.dto.TaskDto;
 import ru.ssau.todo.exceptions.MaxActiveCountTaskException;
 import ru.ssau.todo.exceptions.TaskNotFoundException;
 import ru.ssau.todo.service.TaskService;
@@ -21,10 +22,10 @@ public class TaskController {
     private TaskService taskService;
 
     @GetMapping()
-    public ResponseEntity<List<Task>> getTasks(@RequestParam(value = "from", required = false)LocalDateTime from, @RequestParam(value = "to", required = false) LocalDateTime to,
-                                               @RequestParam(value = "userId") Long userId){
-        if (from == null) from = LocalDateTime.MIN;
-        if (to == null) to = LocalDateTime.MAX;
+    public ResponseEntity<List<TaskDto>> getTasks(@RequestParam(value = "from", required = false)LocalDateTime from, @RequestParam(value = "to", required = false) LocalDateTime to,
+                                                  @RequestParam(value = "userId") Long userId){
+        if (from == null) from = LocalDateTime.of(1970, 1, 1,0,0);
+        if (to == null) to = LocalDateTime.of(3001, 1,1,0,0);
         if (from.isAfter(to)) {
             LocalDateTime tempDate = to;
             to = from;
@@ -34,24 +35,24 @@ public class TaskController {
     }
 
     @PostMapping()
-    public ResponseEntity<Task> createTask(@RequestBody Task task){
-        Task createdtask = taskService.createTask(task);
+    public ResponseEntity<TaskDto> createTask(@RequestBody TaskDto taskDto){
+        TaskDto createdtask = taskService.createTask(taskDto);
         if (createdtask != null) return ResponseEntity.status(HttpStatus.CREATED).header("Location", "/tasks/"+createdtask.getId()).body(createdtask);
         return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Task>> getTask(@PathVariable(name = "id") Long id){
-        Optional<Task> foundedTask = taskService.findById(id);
+    public ResponseEntity<Optional<TaskDto>> getTask(@PathVariable(name = "id") Long id){
+        Optional<TaskDto> foundedTask = taskService.findById(id);
         if (foundedTask.isPresent()) return ResponseEntity.status(HttpStatus.OK).body(foundedTask);
         else return ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> refreshTask(@PathVariable(name = "id") Long id, @RequestBody Task task) throws Exception {
-        task.setId(id);
+    public ResponseEntity<Void> refreshTask(@PathVariable(name = "id") Long id, @RequestBody TaskDto taskDto) throws Exception {
+        taskDto.setId(id);
         try {
-            taskService.updateTask(task);
+            taskService.updateTask(taskDto);
         }
         catch (TaskNotFoundException e){
             return ResponseEntity.notFound().build();
