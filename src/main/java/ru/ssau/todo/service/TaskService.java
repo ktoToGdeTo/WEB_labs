@@ -1,7 +1,6 @@
 package ru.ssau.todo.service;
 
 import lombok.AllArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.ssau.todo.entity.Task;
 import ru.ssau.todo.entity.TaskStatus;
@@ -23,6 +22,16 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
 
+    private boolean isActive(Task task){
+        if (task.getStatus().equals(TaskStatus.IN_PROGRESS) || task.getStatus().equals(TaskStatus.OPEN)) return true;
+        return false;
+    }
+
+    private boolean isMaxCount(Task task){
+        return taskRepository.countActiveTasksByUserId(task.getCreatedBy()) >= MAX_ACTIVE_TASKS;
+    }
+
+
     public void deleteTask(long id) {
         LocalDateTime createdTaskTime = taskRepository.findById(id).get().getCreatedAt();
         if (ChronoUnit.MINUTES.between(createdTaskTime, LocalDateTime.now().withNano(0)) > DELETE_TIME)
@@ -38,21 +47,18 @@ public class TaskService {
     }
 
     public void updateTask(Task task) throws TaskNotFoundException, MaxActiveCountTaskException {
-        if (taskRepository.countActiveTasksByUserId(taskRepository.findById(task.getId()).get().getCreatedBy()) < MAX_ACTIVE_TASKS) {
-            taskRepository.update(task);
-            return;
-        } else if (!task.getStatus().equals(TaskStatus.OPEN) && !task.getStatus().equals(TaskStatus.IN_PROGRESS))
-        {
-            taskRepository.update(task);
-            return;
+        Optional<Task> foundTask = taskRepository.findById(task.getId());
+        if(foundTask.isEmpty()) throw new TaskNotFoundException();
+        if(foundTask.get().getStatus().equals(task.getStatus())) taskRepository.update(task);
+        if(!isActive(foundTask.get()) && isActive(task)){
+            if(isMaxCount(foundTask.get())) throw new MaxActiveCountTaskException();
         }
-        throw new MaxActiveCountTaskException();
+        taskRepository.update(task);
     }
 
     public Task createTask(Task task) {
-        if ((taskRepository.countActiveTasksByUserId(task.getCreatedBy()) < MAX_ACTIVE_TASKS)
-        || (task.getStatus().equals(TaskStatus.CLOSED) || task.getStatus().equals(TaskStatus.DONE))) return this.taskRepository.create(task);
-        return null;
+        if (isActive(task) && isMaxCount(task)) return null;
+        return this.taskRepository.create(task);
     }
 
     public long countActiveTasksByUserId(long id) {
