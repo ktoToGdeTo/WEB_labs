@@ -23,8 +23,7 @@ public class TaskService {
     private final TaskRepository taskRepository;
 
     private boolean isActive(Task task){
-        if (task.getStatus().equals(TaskStatus.IN_PROGRESS) || task.getStatus().equals(TaskStatus.OPEN)) return true;
-        return false;
+        return task.getStatus().equals(TaskStatus.IN_PROGRESS) || task.getStatus().equals(TaskStatus.OPEN);
     }
 
     private boolean isMaxCount(Task task){
