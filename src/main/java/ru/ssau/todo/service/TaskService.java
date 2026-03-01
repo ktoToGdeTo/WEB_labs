@@ -6,6 +6,7 @@ import ru.ssau.todo.entity.Task;
 import ru.ssau.todo.entity.TaskStatus;
 import ru.ssau.todo.entity.User;
 import ru.ssau.todo.entity.dto.TaskDto;
+import ru.ssau.todo.entity.dto.TaskStatusDto;
 import ru.ssau.todo.exceptions.MaxActiveCountTaskException;
 import ru.ssau.todo.exceptions.TaskNotFoundException;
 import ru.ssau.todo.repository.TaskRepository;
@@ -13,8 +14,11 @@ import ru.ssau.todo.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -94,5 +98,9 @@ public class TaskService {
 
     public long countActiveTasksByUserId(long id) {
         return taskRepository.countActiveTasksByUserId(id);
+    }
+
+    public Map<String, Long> countStatusTasks(){
+        return taskRepository.countTasksStatus().stream().collect(Collectors.toMap(TaskStatusDto::getStatus, TaskStatusDto::getCount));
     }
 }

@@ -3,6 +3,7 @@ package ru.ssau.todo.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.ssau.todo.entity.Task;
+import ru.ssau.todo.entity.dto.TaskStatusDto;
 import ru.ssau.todo.exceptions.TaskNotFoundException;
 
 import java.time.LocalDateTime;
@@ -46,4 +47,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
      */
     @Query(value = "select count(t) from Task t where t.user.id = :userId and status in ('OPEN', 'IN_PROGRESS')")
     long countActiveTasksByUserId(long userId);
+
+    @Query(nativeQuery = true, value = "select s.status, count(t.status) from (values('OPEN'::text), ('CLOSED'::text), ('IN_PROGRESS'::text), ('DONE'::text)) as s(status) left join task t on t.status = s.status group by s.status")
+    List<TaskStatusDto> countTasksStatus();
 }

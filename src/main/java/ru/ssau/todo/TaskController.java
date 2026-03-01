@@ -6,12 +6,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.ssau.todo.entity.Task;
 import ru.ssau.todo.entity.dto.TaskDto;
+import ru.ssau.todo.entity.dto.TaskStatusDto;
 import ru.ssau.todo.exceptions.MaxActiveCountTaskException;
 import ru.ssau.todo.exceptions.TaskNotFoundException;
 import ru.ssau.todo.service.TaskService;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -72,5 +75,10 @@ public class TaskController {
     @GetMapping("/active/count")
     public ResponseEntity<Long> countActiveTasks(@RequestParam(value = "userId") Long userId){
         return ResponseEntity.ok(taskService.countActiveTasksByUserId(userId));
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<Map<String, Long>> countTasks(){
+        return ResponseEntity.ok().body(taskService.countStatusTasks());
     }
 }
