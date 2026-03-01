@@ -42,14 +42,14 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<TaskDto>> getTask(@PathVariable(name = "id") Long id){
+    public ResponseEntity<TaskDto> getTask(@PathVariable(name = "id") Long id){
         Optional<TaskDto> foundedTask = taskService.findById(id);
-        if (foundedTask.isPresent()) return ResponseEntity.status(HttpStatus.OK).body(foundedTask);
+        if (foundedTask.isPresent()) return ResponseEntity.status(HttpStatus.OK).body(foundedTask.get());
         else return ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> refreshTask(@PathVariable(name = "id") Long id, @RequestBody TaskDto taskDto) throws Exception {
+    public ResponseEntity<String> refreshTask(@PathVariable(name = "id") Long id, @RequestBody TaskDto taskDto) throws Exception {
         taskDto.setId(id);
         try {
             taskService.updateTask(taskDto);
@@ -57,15 +57,15 @@ public class TaskController {
         catch (TaskNotFoundException e){
             return ResponseEntity.notFound().build();
         } catch (MaxActiveCountTaskException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("The user has the maximum number of tasks.");
         }
         return ResponseEntity.ok(null);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable(name = "id") Long id){
+    public ResponseEntity<String> deleteTask(@PathVariable(name = "id") Long id){
         taskService.deleteTask(id);
-        if(taskService.findById(id).isPresent()) return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        if(taskService.findById(id).isPresent()) return ResponseEntity.status(HttpStatus.CONFLICT).body("Task not found.");;
         return ResponseEntity.noContent().build();
     }
 
