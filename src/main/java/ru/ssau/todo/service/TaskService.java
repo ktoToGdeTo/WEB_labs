@@ -15,6 +15,7 @@ import ru.ssau.todo.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -33,7 +34,7 @@ public class TaskService {
         taskDto.setTitle(task.getTitle());
         taskDto.setCreatedBy(task.getUser().getId());
         taskDto.setCreatedAt(task.getCreatedAt());
-        taskDto.setStatus(TaskStatus.valueOf(task.getStatus()));
+        taskDto.setStatus(task.getStatus());
         return taskDto;
     }
 
@@ -60,7 +61,7 @@ public class TaskService {
         if(task.isEmpty()) throw new TaskNotFoundException();
         Task t = task.get();
         t.setTitle(taskDto.getTitle());
-        t.setStatus(taskDto.getStatus().toString());
+        t.setStatus(taskDto.getStatus());
         System.err.println(taskRepository.countActiveTasksByUserId(t.getUser().getId()));
         if (taskRepository.countActiveTasksByUserId(t.getUser().getId()) < MAX_ACTIVE_TASKS) {
             taskRepository.save(t);
@@ -77,7 +78,7 @@ public class TaskService {
         if ((taskRepository.countActiveTasksByUserId(user.get().getId()) < MAX_ACTIVE_TASKS)
         || (taskDto.getStatus().equals(TaskStatus.CLOSED) || taskDto.getStatus().equals(TaskStatus.DONE))) {
             Task task = new Task();
-            task.setStatus(taskDto.getStatus().toString());
+            task.setStatus(taskDto.getStatus());
             task.setCreatedAt(getNow());
             task.setUser(user.get());
             task.setTitle(taskDto.getTitle());
