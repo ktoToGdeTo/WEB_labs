@@ -1,12 +1,13 @@
 package ru.ssau.todo.service;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import ru.ssau.todo.entity.Task;
 import ru.ssau.todo.entity.TaskStatus;
 import ru.ssau.todo.entity.User;
 import ru.ssau.todo.entity.dto.TaskDto;
+import ru.ssau.todo.entity.dto.TaskStatusDto;
 import ru.ssau.todo.exceptions.MaxActiveCountTaskException;
 import ru.ssau.todo.exceptions.TaskNotFoundException;
 import ru.ssau.todo.repository.TaskRepository;
@@ -17,18 +18,19 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class TaskService {
 
-    private final int DELETE_TIME = 5;
+    private final int DELETE_TIME = 0;
     private final int MAX_ACTIVE_TASKS = 3;
 
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
 
-    private TaskDto taskToDto(Task task){
+    private TaskDto taskToDto(Task task) {
         TaskDto taskDto = new TaskDto();
         taskDto.setId(task.getId());
         taskDto.setTitle(task.getTitle());
@@ -38,7 +40,18 @@ public class TaskService {
         return taskDto;
     }
 
-    private LocalDateTime getNow() { return LocalDateTime.now().withNano(0); }
+    private boolean isActive(TaskDto task) {
+        if (task.getStatus().equals(TaskStatus.IN_PROGRESS) || task.getStatus().equals(TaskStatus.OPEN)) return true;
+        return false;
+    }
+
+    private boolean isMaxCount(long id) {
+        return taskRepository.countActiveTasksByUserId(id) >= MAX_ACTIVE_TASKS;
+    }
+
+    private LocalDateTime getNow() {
+        return LocalDateTime.now().withNano(0);
+    }
 
     public void deleteTask(long id) {
         LocalDateTime createdTaskTime = taskRepository.findById(id).get().getCreatedAt();
@@ -57,38 +70,39 @@ public class TaskService {
     }
 
     public void updateTask(TaskDto taskDto) throws TaskNotFoundException, MaxActiveCountTaskException {
-        Optional<Task> task = taskRepository.findById(taskDto.getId());
-        if(task.isEmpty()) throw new TaskNotFoundException();
-        Task t = task.get();
-        t.setTitle(taskDto.getTitle());
-        t.setStatus(taskDto.getStatus());
-        System.err.println(taskRepository.countActiveTasksByUserId(t.getUser().getId()));
-        if (taskRepository.countActiveTasksByUserId(t.getUser().getId()) < MAX_ACTIVE_TASKS) {
-            taskRepository.save(t);
-        } else if (!taskDto.getStatus().equals(TaskStatus.OPEN) && !taskDto.getStatus().equals(TaskStatus.IN_PROGRESS))
-        {
-            taskRepository.save(t);
+        Optional<Task> foundTask = taskRepository.findById(taskDto.getId());
+        if(foundTask.isEmpty()) throw new TaskNotFoundException();
+        Task task = foundTask.get();
+        if(taskDto.getStatus().equals(task.getStatus())) {
+            taskRepository.save(task);
+            return;
         }
-        else throw new MaxActiveCountTaskException();
+        if(!isActive(taskToDto(task)) && isActive(taskDto)){
+            if(isMaxCount(task.getUser().getId())) throw new MaxActiveCountTaskException();
+        }
+        task.setTitle(taskDto.getTitle());
+        task.setStatus(taskDto.getStatus());
+        taskRepository.save(task);
     }
 
-    public TaskDto createTask(TaskDto taskDto) {
-        Optional<User> user = userRepository.findById(taskDto.getCreatedBy());
-        if(user.isEmpty()) return null;
-        if ((taskRepository.countActiveTasksByUserId(user.get().getId()) < MAX_ACTIVE_TASKS)
-        || (taskDto.getStatus().equals(TaskStatus.CLOSED) || taskDto.getStatus().equals(TaskStatus.DONE))) {
-            Task task = new Task();
-            task.setStatus(taskDto.getStatus());
-            task.setCreatedAt(getNow());
-            task.setUser(user.get());
-            task.setTitle(taskDto.getTitle());
-            this.taskRepository.save(task);
-            return taskToDto(task);
-        }
-        return null;
+    public TaskDto createTask(TaskDto taskDto, Authentication auth) {
+        User user = userRepository.findByUsername(auth.getName());
+        if (user == null) return null;
+        if (isActive(taskDto) && isMaxCount(user.getId())) return null;
+        Task task = new Task();
+        task.setStatus(taskDto.getStatus());
+        task.setCreatedAt(getNow());
+        task.setUser(user);
+        task.setTitle(taskDto.getTitle());
+        taskRepository.save(task);
+        return taskToDto(task);
     }
 
     public long countActiveTasksByUserId(long id) {
         return taskRepository.countActiveTasksByUserId(id);
+    }
+
+    public Map<String, Long> countStatusTasks() {
+        return taskRepository.countTasksStatus().stream().collect(Collectors.toMap(TaskStatusDto::getStatus, TaskStatusDto::getCount));
     }
 }

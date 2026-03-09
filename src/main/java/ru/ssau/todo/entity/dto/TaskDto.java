@@ -1,8 +1,6 @@
 package ru.ssau.todo.entity.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.ssau.todo.entity.TaskStatus;
 
