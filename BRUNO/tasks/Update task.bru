@@ -1,0 +1,22 @@
+meta {
+  name: Update task
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{base-url}}/tasks/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 3
+}
+
+body:json {
+  {
+    "title":"Test task in_progress1",
+    "status":"DONE"
+  }
+}

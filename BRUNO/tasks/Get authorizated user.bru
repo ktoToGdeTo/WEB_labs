@@ -1,0 +1,16 @@
+meta {
+  name: Get authorizated user
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{base-url}}/auth/me
+  body: multipartForm
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

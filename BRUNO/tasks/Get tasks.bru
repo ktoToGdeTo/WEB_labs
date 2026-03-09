@@ -1,0 +1,17 @@
+meta {
+  name: Get tasks
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base-url}}/tasks?userId=3
+  body: none
+  auth: inherit
+}
+
+params:query {
+  userId: 3
+  ~from: 2026-02-14T11:55:00
+  ~to: 2026-05-20T23:59:00
+}

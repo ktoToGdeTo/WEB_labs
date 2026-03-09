@@ -1,0 +1,15 @@
+meta {
+  name: Get task by ID
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base-url}}/tasks/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}

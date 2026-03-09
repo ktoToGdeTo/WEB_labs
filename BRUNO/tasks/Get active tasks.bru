@@ -1,0 +1,19 @@
+meta {
+  name: Get active tasks
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{base-url}}/tasks/active/count?userId=3
+  body: none
+  auth: inherit
+}
+
+params:query {
+  userId: 3
+}
+
+vars:pre-request {
+  baseURL: 
+}
