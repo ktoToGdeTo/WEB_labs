@@ -4,27 +4,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.ssau.todo.entity.Task;
 import ru.ssau.todo.entity.dto.TaskStatusDto;
-import ru.ssau.todo.exceptions.TaskNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * Интерфейс репозитория для управления жизненным циклом сущностей {@link Task}.
  * Обеспечивает абстракцию над механизмом хранения данных.
  */
 public interface TaskRepository extends JpaRepository<Task, Long> {
-
-    /**
-     * Выполняет поиск задачи по её уникальному идентификатору.
-     *
-     * @param id уникальный идентификатор задачи.
-     * @return {@link Optional}, содержащий найденную задачу,
-     * или пустой Optional, если задача с таким ID не найдена.
-     */
-    Optional<Task> findById(long id);
 
     /**
      * Возвращает список всех задач конкретного пользователя, созданных в указанном временном диапазоне.

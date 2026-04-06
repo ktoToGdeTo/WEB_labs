@@ -37,8 +37,8 @@ public class SecurityConfig {
                         .requestMatchers("/users/register").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/tasks/{id}").hasRole("ADMIN")
                         .anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults())
-
+                //.httpBasic(Customizer.withDefaults())
+                .formLogin(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable());
 
         return httpSecurity.build();
