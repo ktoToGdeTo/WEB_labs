@@ -34,11 +34,16 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/users/register").permitAll()
+                        .requestMatchers("/users/register","/auth/login").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/tasks/{id}").hasRole("ADMIN")
                         .anyRequest().authenticated())
-                //.httpBasic(Customizer.withDefaults())
-                .formLogin(Customizer.withDefaults())
+                .httpBasic(Customizer.withDefaults())
+                .formLogin(form -> form
+                        .loginPage("/auth/login")
+                        .defaultSuccessUrl("/auth/success", true)
+                        .failureUrl("/auth/error?error=true")
+                        .permitAll()
+                )
                 .csrf(csrf -> csrf.disable());
 
         return httpSecurity.build();

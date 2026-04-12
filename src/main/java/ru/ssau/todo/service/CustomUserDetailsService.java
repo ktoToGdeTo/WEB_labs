@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import ru.ssau.todo.entity.Role;
 import ru.ssau.todo.entity.User;
 import ru.ssau.todo.entity.dto.UserDto;
+import ru.ssau.todo.exceptions.UserAlreadyRegister;
 import ru.ssau.todo.repository.RoleRepository;
 import ru.ssau.todo.repository.UserRepository;
 
@@ -40,6 +41,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     public void registerUser(UserDto userDto) {
+        if(userRepository.findByUsername(userDto.getUsername()) != null) throw new UserAlreadyRegister();
         User user = new User();
         user.setId(userDto.getId());
         user.setUsername(userDto.getUsername());

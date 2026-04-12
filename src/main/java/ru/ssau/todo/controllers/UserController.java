@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.ssau.todo.entity.dto.UserDto;
+import ru.ssau.todo.exceptions.UserAlreadyRegister;
 import ru.ssau.todo.service.CustomUserDetailsService;
 
 @RestController
@@ -17,8 +18,13 @@ public class UserController {
     private CustomUserDetailsService userDetailsService;
 
     @PostMapping("/register")
-    public ResponseEntity<Void> registerUser(@RequestBody UserDto userDto) {
-        userDetailsService.registerUser(userDto);
+    public ResponseEntity<?> registerUser(@RequestBody UserDto userDto) {
+        try{
+            userDetailsService.registerUser(userDto);
+        }
+        catch (UserAlreadyRegister e){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Пользователь уже есть с таким именем. Используйте другое.");
+        }
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
