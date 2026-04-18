@@ -19,21 +19,22 @@ public class AuthController {
     public ResponseEntity<Map<String, Object>> getAuthorizatedUser(Authentication auth) {
         Map<String, Object> user = new LinkedHashMap<>();
         user.put("username", auth.getName());
-        user.put("roles", auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).filter(a -> a.contains("ROLE_")).toList());
+//        user.put("roles", auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).filter(a -> a.contains("ROLE_")).toList());
+        user.put("roles", auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList());
 
         return ResponseEntity.ok(user);
     }
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(){
-        return ResponseEntity.status(HttpStatus.OK).body("test");
+    public ResponseEntity<?> loginUser(){
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
     @GetMapping("/success")
     public String success() {
-        return "{\"status\":\"ok\",\"message\":\"Login successful\"}";
+        return "Login successful";
     }
 
     @GetMapping("/error")
     public String error() {
-        return "{\"status\":\"fail\",\"message\":\"Login failed\"}";
+        return "Login failed";
     }
 }

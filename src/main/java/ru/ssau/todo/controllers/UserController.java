@@ -11,7 +11,6 @@ import ru.ssau.todo.service.CustomUserDetailsService;
 
 @RestController
 @RequestMapping("/users")
-@RequiredArgsConstructor
 public class UserController {
 
     @Autowired
