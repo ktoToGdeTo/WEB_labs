@@ -63,6 +63,10 @@ public class TaskService {
         List<Task> tasks = taskRepository.findAll(from, to, userId);
         return tasks.stream().map(this::taskToDto).toList();
     }
+    public List<TaskDto> getAllTasks() {
+        List<Task> tasks = taskRepository.findAll();
+        return tasks.stream().map(this::taskToDto).toList();
+    }
 
     public Optional<TaskDto> findById(long id) {
         Optional<Task> task = taskRepository.findById(id);
@@ -74,6 +78,7 @@ public class TaskService {
         if(foundTask.isEmpty()) throw new TaskNotFoundException();
         Task task = foundTask.get();
         if(taskDto.getStatus().equals(task.getStatus())) {
+            task.setTitle(taskDto.getTitle());
             taskRepository.save(task);
             return;
         }

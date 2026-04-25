@@ -1,0 +1,7 @@
+@for (task of tasks; track task.id){
+    <app-view-task [task]="task" (deleteTask)="deleteTask($event)"  (changeTask)="updateTask($event)"></app-view-task>
+}
+@empty {
+    <div>Тасок пока нет :( </div>
+}
+

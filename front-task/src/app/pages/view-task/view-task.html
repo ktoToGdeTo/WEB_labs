@@ -1,0 +1,33 @@
+<div>
+<div>
+    <p>{{task.title}}</p>
+    <p [class]="task.status">Статус:
+        @switch(task.status){
+            @case ("OPEN") {
+                Открыто
+            }
+            @case ("CLOSED") {
+                Закрыто
+            }
+            @case ("IN_PROGRESS") {
+                В процессе
+            }
+            @case ("DONE") {
+                Завершено
+            }
+        }
+    
+    </p>
+    <p>Создано: {{task.createdAt | date:'dd.MM.yyyy HH:mm'}}</p>
+</div>
+
+<div class="task-actions">
+    <button class="update-btn" (click)="onChange()">
+      Редактировать
+    </button>
+    
+    <button *ngIf="hasRole('ROLE_ADMIN')" class="delete-btn" (click)="onDelete()">
+      Удалить
+    </button>
+  </div>
+  </div>

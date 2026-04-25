@@ -79,4 +79,9 @@ public class TaskController {
     public ResponseEntity<Map<String, Long>> countTasks() {
         return ResponseEntity.ok().body(taskService.countStatusTasks());
     }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<TaskDto>> getAllTasks(){
+        return ResponseEntity.ok(taskService.getAllTasks());
+    }
 }

@@ -1,0 +1,6 @@
+<p>login-component works!</p>
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+  <input formControlName="username" type="text" placeholder="Your username">
+  <input formControlName="password" type="password" placeholder="Your password">
+  <button type="submit" [disabled]="loginForm.invalid">Login</button>
+</form>

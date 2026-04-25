@@ -1,0 +1,23 @@
+.DONE {
+  background: #fff3e0;
+  color: #ff9800;
+  border-left: 3px solid #ff9800;
+}
+
+.OPEN {
+  background: #e3f2fd;
+  color: #2196f3;
+  border-left: 3px solid #2196f3;
+}
+
+.IN_PROGRESS {
+  background: #e8f5e9;
+  color: #4caf50;
+  border-left: 3px solid #4caf50;
+}
+
+.CLOSED {
+  background: #f3e5f5;
+  color: #9c27b0;
+  border-left: 3px solid #9c27b0;
+}

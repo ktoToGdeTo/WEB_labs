@@ -1,0 +1,20 @@
+<div>
+    <h2>{{ isCreateMode ? 'Создание задачи' : 'Редактирование задачи' }}</h2>
+    <form (ngSubmit)="onSubmit()" [formGroup]="taskForm">
+<label for="title">Название</label>
+    <input id="title" formControlName="title" type="text" />
+
+        <label for="status">Статус</label>
+    <select id="status" formControlName="status">
+      <option value="" disabled>Выберите статус</option>
+      @for (s of statusOptions; track $index) {
+        <option [value]="s.value">{{ s.label }}</option>
+      }
+    </select>
+
+    <button type="submit" [disabled]="taskForm.invalid">
+        {{ isCreateMode ? 'Создать задачу' : 'Обновить задачу' }}
+    </button>
+    <button type="button" (click)="onCancel()" >Отмена</button>
+    </form>
+</div>
