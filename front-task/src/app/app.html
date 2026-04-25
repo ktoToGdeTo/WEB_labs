@@ -1,34 +1,33 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg pink-navbar sticky-top">
   <div class="container-fluid">
-    <a routerLink="/" class="navbar-brand">
-      <img width="5%" src="assets/52.jpg">
-      Меня очень просили добавить этого человека | TaskCracker
+    <a routerLink="/" class="navbar-brand d-flex align-items-center gap-2">
+      <img class="brand-logo" src="assets/52.jpg" alt="logo">
+      <span class="brand-text">TaskCracker</span>
     </a>
+
     <div class="collapse navbar-collapse" id="navbarText">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-1">
         @if (auth.isAuthenticated$ | async) {
-        <li class="nav-item me-3">
-          <a class="nav-link" routerLink="/tasks">Задачи</a>
+        <li class="nav-item">
+          <a class="nav-link pink-link" routerLink="/tasks" routerLinkActive="active-link">Задачи</a>
         </li>
-        <li class="nav-item me-3">
-          <a class="nav-link" routerLink="/tasks/new">Создать задачу</a>
+        <li class="nav-item">
+          <a class="nav-link pink-link" routerLink="/tasks/new" routerLinkActive="active-link">Создать задачу</a>
         </li>
         }
       </ul>
-  
-      <div class="navbar-text">
-       @if (auth.isAuthenticated$ | async) {
-          <li class="nav-item">
-            <a href="#" (click)="$event.preventDefault(); logout()"><button
-                class="btn btn-outline-danger">Выход</button></a>
-          </li>
-          }
-          @else {
-          <li class="nav-item">
-            <a routerLink="/login"><button class="btn btn-primary">Вход</button></a>
-          </li>
-          }
-        </div>
+
+      <div class="navbar-actions">
+        @if (auth.isAuthenticated$ | async) {
+        <button class="btn btn-pink btn-logout" (click)="logout()">
+          <i class="bi bi-box-arrow-right"></i> Выход
+        </button>
+        } @else {
+        <a routerLink="/login" class="btn btn-pink btn-login">
+          <i class="bi bi-box-arrow-in-right"></i> Вход
+        </a>
+        }
+      </div>
     </div>
   </div>
 </nav>

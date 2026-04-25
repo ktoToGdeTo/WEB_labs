@@ -1,33 +1,28 @@
-<div>
-<div>
-    <p>{{task.title}}</p>
-    <p [class]="task.status">Статус:
-        @switch(task.status){
-            @case ("OPEN") {
-                Открыто
-            }
-            @case ("CLOSED") {
-                Закрыто
-            }
-            @case ("IN_PROGRESS") {
-                В процессе
-            }
-            @case ("DONE") {
-                Завершено
-            }
-        }
-    
-    </p>
-    <p>Создано: {{task.createdAt | date:'dd.MM.yyyy HH:mm'}}</p>
-</div>
+<div class="task-card">
+  <div class="task-header">
+    <h3 class="task-title">{{ task.title }}</h3>
+    <span class="status-badge" [class]="'status-' + task.status.toLowerCase()">
+      @switch(task.status) {
+        @case ("OPEN") { Открыто }
+        @case ("CLOSED") { Закрыто }
+        @case ("IN_PROGRESS") { В процессе }
+        @case ("DONE") { Завершено }
+      }
+    </span>
+  </div>
 
-<div class="task-actions">
-    <button class="update-btn" (click)="onChange()">
-      Редактировать
+  <div class="task-meta">
+    <span class="meta-dot"></span>
+    <span>Создано: {{ task.createdAt | date:'dd.MM.yyyy HH:mm' }}</span>
+  </div>
+
+  <div class="task-actions">
+    <button class="btn-task btn-edit" (click)="onChange()">
+      ✏️ Редактировать
     </button>
     
-    <button *ngIf="hasRole('ROLE_ADMIN')" class="delete-btn" (click)="onDelete()">
-      Удалить
+    <button *ngIf="hasRole('ROLE_ADMIN')" class="btn-task btn-delete" (click)="onDelete()">
+      🗑️ Удалить
     </button>
   </div>
-  </div>
+</div>

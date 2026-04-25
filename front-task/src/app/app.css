@@ -1,0 +1,116 @@
+/* ─── Навбар ─── */
+.pink-navbar {
+  background: linear-gradient(135deg, #f9a8d4 0%, #f472b6 40%, #ec4899 100%);
+  box-shadow: 0 4px 20px rgba(236, 72, 153, 0.35);
+  padding: 0.6rem 1.5rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
+  transition: box-shadow 0.3s ease;
+}
+
+.pink-navbar:hover {
+  box-shadow: 0 6px 28px rgba(236, 72, 153, 0.5);
+}
+
+/* ─── Логотип ─── */
+.brand-logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  object-fit: cover;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.brand-logo:hover {
+  transform: scale(1.1) rotate(-5deg);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+.brand-text {
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.35rem;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  transition: text-shadow 0.3s ease;
+}
+
+.brand-text:hover {
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.7);
+}
+
+/* ─── Ссылки навигации ─── */
+.pink-link {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 0.5rem 1rem !important;
+  border-radius: 25px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.pink-link::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: #fff;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.pink-link:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.pink-link:hover::after {
+  width: 60%;
+}
+
+/* Активная ссылка */
+.active-link {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.25) !important;
+  font-weight: 600 !important;
+}
+
+/* ─── Кнопки ─── */
+.btn-pink {
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.45rem 1.3rem;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.btn-pink:hover {
+  background: #fff;
+  color: #ec4899;
+  border-color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.35);
+}
+
+.btn-login {
+  background: #fff;
+  color: #ec4899;
+  border: 2px solid #fff;
+}
+
+.btn-login:hover {
+  background: transparent;
+  color: #fff;
+}
+
+.btn-logout {
+  background: rgba(255, 255, 255, 0.15);
+}

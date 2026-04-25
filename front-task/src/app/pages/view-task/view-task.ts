@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { TaskService } from '../../core/services/taskService';
 import { Task } from '../../core/entity/Task';
 import { CommonModule } from '@angular/common';
@@ -10,6 +10,8 @@ import { CommonModule } from '@angular/common';
   styleUrl: './view-task.css',
 })
 export class ViewTask{
+
+  private cd = inject(ChangeDetectorRef);
   @Input({ required: true }) task!: Task;
   @Output() deleteTask = new EventEmitter<number>();
   @Output() changeTask = new EventEmitter<number>();
@@ -17,6 +19,7 @@ export class ViewTask{
 
   onDelete(): void {
     this.deleteTask.emit(this.task.id);
+    this.cd.markForCheck();
   }
 
   onChange(): void {
